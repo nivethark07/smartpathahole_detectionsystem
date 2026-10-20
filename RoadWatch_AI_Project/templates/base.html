@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}RoadWatch AI{% endblock %}</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+  {% block head %}{% endblock %}
+</head>
+<body>
+<div class="app-shell">
+  <aside class="sidebar">
+    <a class="brand" href="{{ url_for('index') }}"><span class="brand-icon">RW</span><span>RoadWatch <em>AI</em><small>ROAD SAFETY INTELLIGENCE</small></span></a>
+    <div class="nav-label">WORKSPACE</div>
+    <nav>
+      <a class="nav-link {% if request.endpoint == 'index' %}active{% endif %}" href="{{ url_for('index') }}"><span>▦</span> Overview</a>
+      <a class="nav-link {% if request.endpoint == 'report_damage' %}active{% endif %}" href="{{ url_for('report_damage') }}"><span>＋</span> Report damage</a>
+      <a class="nav-link {% if request.endpoint == 'damage_map' %}active{% endif %}" href="{{ url_for('damage_map') }}"><span>⌖</span> Damage map</a>
+      <a class="nav-link {% if request.endpoint in ['reports','report_detail'] %}active{% endif %}" href="{{ url_for('reports') }}"><span>☷</span> Reports & repairs</a>
+      <a class="nav-link {% if request.endpoint == 'analytics' %}active{% endif %}" href="{{ url_for('analytics') }}"><span>▥</span> Analytics & export</a>
+    </nav>
+    <div class="sidebar-bottom"><div class="status-dot"></div><div><b>Demo environment</b><small>Local application</small></div></div>
+  </aside>
+  <main class="main-area">
+    <header class="topbar"><div><span class="crumb">ECOTHAN HACKATHON</span><span class="crumb-sep">/</span><span>{% block page_name %}Overview{% endblock %}</span></div><div class="topbar-right"><span class="live-pill"><i></i> SYSTEM ONLINE</span><div class="avatar">RW</div></div></header>
+    {% with messages = get_flashed_messages(with_categories=true) %}{% if messages %}<div class="flash-wrap">{% for category, message in messages %}<div class="flash {{ category }}">{{ message }} <button onclick="this.parentElement.remove()">×</button></div>{% endfor %}</div>{% endif %}{% endwith %}
+    <section class="page-content">{% block content %}{% endblock %}</section>
+    <footer>ROADWATCH AI <span>•</span> Safer roads begin with one report.</footer>
+  </main>
+</div>
+<script src="{{ url_for('static', filename='js/app.js') }}"></script>{% block scripts %}{% endblock %}
+</body></html>

@@ -1,0 +1,3 @@
+-r requirements.txt
+# Optional: install this only if you have compatible trained pothole weights in models/pothole.pt
+ultralytics>=8.2,<9.0

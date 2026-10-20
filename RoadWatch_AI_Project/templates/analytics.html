@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+{% block title %}Analytics & export | RoadWatch AI{% endblock %}
+{% block page_name %}Analytics & export{% endblock %}
+{% block head %}<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>{% endblock %}
+{% block content %}
+<div class="page-intro intro-row"><div><div class="eyebrow"><span class="eyebrow-line"></span> DATA INSIGHTS</div><h1>Analytics <span>& reports.</span></h1><p>Understand reported road damage, open risks, repair progress and trends from the saved database.</p></div><div style="display:flex;gap:10px;flex-wrap:wrap"><a class="btn btn-primary" href="{{ url_for('export_csv') }}">↓ Export CSV</a><button class="btn btn-secondary" onclick="window.print()">Print analysis report</button></div></div>
+<div class="stats-grid">
+<div class="stat-card"><div class="stat-top"><span>Total reports</span><span class="stat-icon blue">▤</span></div><div class="stat-number">{{ total }}</div><div class="stat-foot">Records in local database</div></div>
+<div class="stat-card"><div class="stat-top"><span>Resolution rate</span><span class="stat-icon green">✓</span></div><div class="stat-number">{{ resolution_rate }}%</div><div class="stat-foot">Resolved ÷ total reports</div></div>
+<div class="stat-card"><div class="stat-top"><span>Open high-risk</span><span class="stat-icon red">⚠</span></div><div class="stat-number">{{ high_open }}</div><div class="stat-foot">High or critical, not resolved</div></div>
+<div class="stat-card"><div class="stat-top"><span>Resolved reports</span><span class="stat-icon green">✓</span></div><div class="stat-number">{{ resolved }}</div><div class="stat-foot">Marked resolved by an operator</div></div>
+</div>
+<div class="content-grid" style="grid-template-columns:repeat(2,minmax(0,1fr));align-items:stretch">
+<div class="panel" style="padding:22px"><div class="panel-heading"><div><h3>Reports by status</h3><p>Current workflow distribution</p></div></div><div style="height:280px"><canvas id="statusChart"></canvas></div></div>
+<div class="panel" style="padding:22px"><div class="panel-heading"><div><h3>Severity distribution</h3><p>Reported priority levels</p></div></div><div style="height:280px"><canvas id="severityChart"></canvas></div></div>
+<div class="panel" style="padding:22px"><div class="panel-heading"><div><h3>Damage categories</h3><p>Most frequently reported issue types</p></div></div><div style="height:300px"><canvas id="typeChart"></canvas></div></div>
+<div class="panel" style="padding:22px"><div class="panel-heading"><div><h3>Submission trend</h3><p>Reports grouped by month</p></div></div><div style="height:300px"><canvas id="trendChart"></canvas></div></div>
+</div>
+<div class="panel" style="padding:22px;margin-top:20px"><div class="panel-heading"><div><h3>Management summary</h3><p>Automatically calculated from saved report records</p></div></div>
+<ul style="line-height:1.9;color:#475569;padding-left:22px"><li><b>{{ total }}</b> road-damage report(s) are currently stored.</li><li><b>{{ high_open }}</b> unresolved high-priority item(s) should be reviewed first.</li><li><b>{{ resolution_rate }}%</b> of reports are marked resolved.</li><li>Use the CSV export to filter, sort, or submit records for further analysis in Excel.</li></ul>
+<p style="font-size:12px;color:#64748b;margin-top:14px">Data note: these charts reflect reports stored in this local application. The database starts empty and charts reflect submitted records only. AI confidence is only meaningful when a compatible trained model is configured.</p></div>
+{% endblock %}
+{% block scripts %}
+<script>
+const chartData = {{ charts|tojson }};
+if (window.Chart) {
+ const common = {responsive:true, maintainAspectRatio:false, plugins:{legend:{position:'bottom'}}};
+ new Chart(document.getElementById('statusChart'), {type:'doughnut',data:{labels:chartData.status_labels,datasets:[{data:chartData.status_values}]},options:common});
+ new Chart(document.getElementById('severityChart'), {type:'bar',data:{labels:chartData.severity_labels,datasets:[{label:'Reports',data:chartData.severity_values,borderWidth:1}]},options:{...common,scales:{y:{beginAtZero:true,ticks:{precision:0}}}}});
+ new Chart(document.getElementById('typeChart'), {type:'bar',data:{labels:chartData.type_labels,datasets:[{label:'Reports',data:chartData.type_values,borderWidth:1}]},options:{...common,indexAxis:'y',scales:{x:{beginAtZero:true,ticks:{precision:0}}}}});
+ new Chart(document.getElementById('trendChart'), {type:'line',data:{labels:chartData.month_labels,datasets:[{label:'Reports submitted',data:chartData.month_values,tension:.25,fill:true}]},options:{...common,scales:{y:{beginAtZero:true,ticks:{precision:0}}}}});
+}
+</script>
+<style>@media print {.sidebar,.topbar,.hero-actions,.btn,footer{display:none!important}.main-area{margin:0!important}.page-content{padding:0!important}.panel,.stat-card{break-inside:avoid;box-shadow:none!important}}</style>
+{% endblock %}
